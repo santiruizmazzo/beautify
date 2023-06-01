@@ -1,7 +1,7 @@
 package beautify
 import java.time.*
 
-class BookedMoment {
+class AppointmentTimeDetail {
 
     LocalDateTime date
     TimeRange timeRange

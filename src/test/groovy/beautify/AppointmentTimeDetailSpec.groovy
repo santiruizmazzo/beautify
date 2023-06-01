@@ -3,7 +3,7 @@ package beautify
 import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
 
-class BookedMomentSpec extends Specification implements DomainUnitTest<BookedMoment> {
+class AppointmentTimeDetailSpec extends Specification implements DomainUnitTest<AppointmentTimeDetail> {
 
     def setup() {
     }
