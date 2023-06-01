@@ -10,9 +10,4 @@ class CustomerSpec extends Specification implements DomainUnitTest<Customer> {
 
     def cleanup() {
     }
-
-    void "test something"() {
-        expect:"fix me"
-            true == false
-    }
 }

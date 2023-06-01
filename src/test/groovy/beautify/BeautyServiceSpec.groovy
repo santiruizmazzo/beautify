@@ -10,9 +10,4 @@ class BeautyServiceSpec extends Specification implements DomainUnitTest<BeautySe
 
     def cleanup() {
     }
-
-    void "test something"() {
-        expect:"fix me"
-            true == false
-    }
 }
