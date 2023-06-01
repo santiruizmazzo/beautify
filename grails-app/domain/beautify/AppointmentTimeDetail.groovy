@@ -8,4 +8,8 @@ class AppointmentTimeDetail {
 
     static constraints = {
     }
+
+    Boolean represents(DayOfWeek dayOfWeek) {
+        this.date.getDayOfWeek() == dayOfWeek
+    }
 }

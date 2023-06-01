@@ -21,8 +21,8 @@ class Appointment {
         }
     }
 
-    def rate(ratingNumber) {
-        if (!attendedByCustomer) {
+    def rate(Integer ratingNumber) {
+        if (!this.attendedByCustomer) {
             throw new InvalidRatingException("No se puede calificar un turno al que no asististe")
         }
         this.rating = ratingNumber
