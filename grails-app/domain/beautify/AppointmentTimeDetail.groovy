@@ -9,7 +9,15 @@ class AppointmentTimeDetail {
     static constraints = {
     }
 
-    Boolean represents(DayOfWeek dayOfWeek) {
-        this.date.getDayOfWeek() == dayOfWeek
+    DayOfWeek dayOfWeek() {
+        this.date.getDayOfWeek()
+    }
+
+    Duration duration() {
+        timeRange.duration()
+    }
+
+    Boolean isWithin(TimeRange timeRange) {
+        this.timeRange.isWithin(timeRange)
     }
 }
