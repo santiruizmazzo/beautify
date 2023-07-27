@@ -2,16 +2,19 @@ package beautify
 
 class Appointment {
 
-    AppointmentTimeDetail timeDetail
+    Customer customer
+    BeautyService service
     BigDecimal servicePriceWhenBooked
-    Boolean attendedByCustomer
+    LocalDate date
+    TimeRange timeRange
+    LocalDateTime cancellationDeadline
+    Boolean attended
     Integer rating
-
-    static belongsTo = [customer : Customer, beautyService : BeautyService]
+    String comment
 
     static constraints = {
         servicePriceWhenBooked min: new BigDecimal(0)
-        rating nullable: true, min: 0, max: 5
+        rating min: 0
         timeDetail nullable: true
     }
 
@@ -21,8 +24,8 @@ class Appointment {
         }
     }
 
-    def rate(Integer ratingNumber) {
-        if (!this.attendedByCustomer) {
+    def rate(Integer score, String comment) {
+        if (!this.attended) {
             throw new InvalidRatingException("No se puede calificar un turno al que no asististe")
         }
         this.rating = ratingNumber
