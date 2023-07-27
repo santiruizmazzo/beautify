@@ -1,6 +1,6 @@
-package beauty_categories
+package beauty_category
 
-enum BeautyCategories {
+enum BeautyCategory {
     HAIRDRESSING,
     BODY,
     FITNESS,
