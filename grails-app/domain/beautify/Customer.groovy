@@ -5,14 +5,12 @@ class Customer {
     String name
     String surname
     String email
-    Long phone
-
-    static hasMany = [appointments : Appointment]
+    String password
 
     static constraints = {
         name blank: false
         surname blank: false
         email email: true, blank: false, unique: true
-        phone unique: true, min: 0L
+        password blank: false, unique: true
     }
 }
