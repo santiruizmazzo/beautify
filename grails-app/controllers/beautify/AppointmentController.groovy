@@ -2,6 +2,10 @@ package beautify
 
 class AppointmentController {
 
-    static scaffold = Appointment
+    def appointmentService
+
+    def book() {
+
+    }
 
 }

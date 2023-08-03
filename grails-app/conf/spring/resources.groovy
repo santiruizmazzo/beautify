@@ -1,3 +1,5 @@
-// Place your Spring DSL code here
+import beautify.repository
+
 beans = {
+    beautyServiceRepository(BeautyServiceRepository)
 }

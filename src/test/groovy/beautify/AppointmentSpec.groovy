@@ -10,4 +10,16 @@ class AppointmentSpec extends Specification implements DomainUnitTest<Appointmen
 
     def cleanup() {
     }
+
+    void "Rating an appointment with a score outside the range from 0 to 5, should fail"() {
+        
+    }
+
+    void "Rating an appointment without attending it previously, should fail"() {
+        
+    }
+
+    void "Rating an appointment when its rating time is over, should fail"() {
+
+    }
 }

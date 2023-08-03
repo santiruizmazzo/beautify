@@ -10,9 +10,4 @@ class AppointmentScheduleSpec extends Specification implements DomainUnitTest<Ap
 
     def cleanup() {
     }
-
-    void "test something"() {
-        expect:"fix me"
-            true == false
-    }
 }

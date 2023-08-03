@@ -1,12 +1,13 @@
 package beautify
+
 import java.time.*
 
 class TimeRange {
 
-    LocalDateTime from
-    LocalDateTime to
+    LocalTime from
+    LocalTime to
 
-    TimeRange(LocalDateTime from, LocalDateTime to) {
+    TimeRange(LocalTime from, LocalTime to) {
         if (from > to) {
             throw new InvalidTimeRangeException("El inicio del rango de tiempo es posterior a su final")
         }
@@ -15,13 +16,10 @@ class TimeRange {
         this.to = to
     }
 
-    static class InvalidTimeRangeException extends Exception {
+    static class InvalidTimeRangeException extends RuntimeException {
         InvalidTimeRangeException(String errorMessage) {
             super(errorMessage)
         }
-    }
-
-    static constraints = {
     }
 
     Duration duration() {
@@ -29,17 +27,17 @@ class TimeRange {
     }
 
     Boolean isWithin(TimeRange timeRange) {
-        timeRange.from < this.from && this.to < timeRange.to
-    }
-
-    Boolean overlaps(TimeRange timeRange) {
-        this.isWithin(timeRange) || 
-        timeRange.isWithin(this) || 
-        this.precedesAndIntersects(timeRange) || 
-        timeRange.precedesAndIntersects(this)
+        from.isAfter(timeRange.from) && to.isBefore(timeRange.to)
     }
 
     Boolean precedesAndIntersects(TimeRange timeRange) {
-        this.from < timeRange.from && this.to > timeRange.from && this.to < timeRange.to
+        from.isBefore(timeRange.from) && to.isAfter(timeRange.from) && to.isBefore(timeRange.to)
+    }
+
+    Boolean overlaps(TimeRange timeRange) {
+        isWithin(timeRange) || 
+        timeRange.isWithin(this) || 
+        precedesAndIntersects(timeRange) || 
+        timeRange.precedesAndIntersects(this)
     }
 }
