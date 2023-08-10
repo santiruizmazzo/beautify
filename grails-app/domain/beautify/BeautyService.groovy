@@ -1,11 +1,10 @@
 package beautify
 
 import java.time.*
-import beauty_category.*
-
-interface CheckAppointmentOverlapping {
-    Boolean existsOverlappingFor(Customer customer, BeautyService beautyService, TimeDetail timeDetail)
-}
+import java.time.format.TextStyle
+import beauty_category.BeautyCategory
+import repository.CheckExistingAppointments
+import time_range.TimeRange
 
 class BeautyService {
 
@@ -13,18 +12,17 @@ class BeautyService {
     String description
     BeautyCategory category
     BigDecimal price
-    Integer minutesBeforeStartToCancel
-    AppointmentSchedule schedule
+    Integer duration
 
     static constraints = {
-        name blank: false, unique: true
+        name blank: false
         description blank: true
         price min: new BigDecimal(0)
-        minutesBeforeStartToCancel min: 0
+        duration min: 0
     }
 
-    static class IncompatibleAppointmentTimeDetailException extends RuntimeException {
-        IncompatibleAppointmentTimeDetailException(String errorMessage) {
+    static class IncompatibleAppointmentTimeRangeException extends RuntimeException {
+        IncompatibleAppointmentTimeRangeException(String errorMessage) {
             super(errorMessage)
         }
     }
@@ -35,15 +33,41 @@ class BeautyService {
         }
     }
 
-    Appointment book(Customer customer, TimeDetail timeDetail, CheckAppointmentOverlapping overlappingChecker) {
-        if (!schedule.matchesWith(timeDetail)) {
-            throw new IncompatibleAppointmentTimeDetailException("Los horarios del turno no son compatibles con los del servicio")
-        } else if (overlappingChecker.existsOverlappingFor(customer, this, timeDetail)) {
-            throw new ExistingAppointmentOverlappingException("El turno a reservar se solapa con uno ya reservado por el cliente")
+    static class AppointmentAlreadyTakenException extends RuntimeException {
+        AppointmentAlreadyTakenException(String errorMessage) {
+            super(errorMessage)
+        }
+    }
+
+    Boolean matchesWithAnAppointment(TimeRange timeRange) {
+        LocalTime currentTime = LocalTime.of(8,0)
+        def timeSchedule = [currentTime]
+
+        while (currentTime.isBefore(LocalTime.of(21,0))) {
+            currentTime = currentTime.plusMinutes(duration)
+            timeSchedule.add(currentTime)
         }
 
-        // falta chequear que el turno no haya sido reservado por otro cliente (ya pregunte a Mauro)
+        timeRange.start.toLocalTime() in timeSchedule
+    }
 
-        new Appointment(timeDetail: timeDetail, servicePriceWhenBooked: price, attendedByCustomer: false, customer: customer, beautyService, this)
+    Boolean isNonWorkableDay(TimeRange timeRange) {
+        DayOfWeek rangeDayOfWeek = timeRange.start.getDayOfWeek()
+        rangeDayOfWeek in [DayOfWeek.SUNDAY]
+    }
+
+    Appointment makeAppointment(Customer customer, TimeRange timeRange, CheckExistingAppointments appointmentsChecker) {        
+        if (!matchesWithAnAppointment(timeRange)) {
+            throw new IncompatibleAppointmentTimeRangeException("No se ofrece ningun turno a las ${timeRange.start.toLocalTime()}")
+        } else if (isNonWorkableDay(timeRange)) {
+            String dayOfWeekInSpanish = timeRange.start.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es", "ES"))
+            throw new IncompatibleAppointmentTimeRangeException("No se ofrecen turnos los dias ${dayOfWeekInSpanish}s")
+        } else if (appointmentsChecker.existsOverlappingFor(customer, timeRange)) {
+            throw new ExistingAppointmentOverlappingException("El turno seleccionado se solapa con uno que ya reservaste")
+        } else if (appointmentsChecker.isTaken(this, timeRange)) {
+            throw new AppointmentAlreadyTakenException("El turno ya fue reservado por otro cliente")
+        }
+
+        new Appointment(customer, this, timeRange)
     }
 }
