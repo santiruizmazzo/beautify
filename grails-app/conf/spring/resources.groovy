@@ -1,5 +1,5 @@
-import beautify.repository
+import repository.AppointmentRepository
 
 beans = {
-    beautyServiceRepository(BeautyServiceRepository)
+    appointmentRepository(AppointmentRepository)
 }
