@@ -1,12 +1,22 @@
 package repository
 
 import beautify.*
+import time_range.TimeRange
 
-class AppointmentRepository implements CheckAppointmentOverlapping {
+interface CheckExistingAppointments {
+    Boolean existsOverlappingFor(Customer customer, TimeRange timeRange)
+    
+    Boolean isTaken(BeautyService beautyService, TimeRange timeRange)
+}
 
-    Boolean existsOverlappingFor(Customer customer, BeautyService beautyService, TimeDetail timeDetail) {
-        List<Appointment> appointments = Appointment.findAllByCustomerAndBeautyService(customer, beautyService)
-        appointments ? (appointments.any { it.timeDetail.overlaps(timeDetail) }) : false
+class AppointmentRepository implements CheckExistingAppointments {
+
+    Boolean existsOverlappingFor(Customer customer, TimeRange timeRange) {
+        List<Appointment> appointments = Appointment.findAllWhere(customer: customer, attended: false)
+        appointments ? (appointments.any { it.timeRange.overlaps(timeRange) }) : false
     }
 
+    Boolean isTaken(BeautyService beautyService, TimeRange timeRange) {
+        Appointment.findByBeautyServiceAndTimeRange(beautyService, timeRange) ? true : false
+    }
 }
