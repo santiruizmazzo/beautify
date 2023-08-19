@@ -11,7 +11,7 @@ class TimeRange {
     TimeRange(){}
 
     TimeRange(LocalDateTime start, LocalDateTime end) {
-        if (start > end) {
+        if (start.isAfter(end)) {
             throw new InvalidTimeRangeException("El inicio del rango de tiempo es posterior a su final")
         }
         

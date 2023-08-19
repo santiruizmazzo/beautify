@@ -3,7 +3,6 @@ package beautify
 import java.time.*
 import java.time.format.TextStyle
 import beauty_category.BeautyCategory
-import repository.CheckExistingAppointments
 import time_range.TimeRange
 
 class BeautyService {
@@ -14,6 +13,8 @@ class BeautyService {
     BigDecimal price
     Integer duration
 
+    static hasMany = [appointments: Appointment]
+
     static constraints = {
         name blank: false
         description blank: true
@@ -21,14 +22,16 @@ class BeautyService {
         duration min: 0
     }
 
-    static class IncompatibleAppointmentTimeRangeException extends RuntimeException {
-        IncompatibleAppointmentTimeRangeException(String errorMessage) {
-            super(errorMessage)
-        }
+    BeautyService(String name, String description, BeautyCategory category, BigDecimal price, Integer duration) {
+        this.name = name
+        this.description = description
+        this.category = category
+        this.price = price
+        this.duration = duration
     }
 
-    static class ExistingAppointmentOverlappingException extends RuntimeException {
-        ExistingAppointmentOverlappingException(String errorMessage) {
+    static class IncompatibleAppointmentStartTimeException extends RuntimeException {
+        IncompatibleAppointmentStartTimeException(String errorMessage) {
             super(errorMessage)
         }
     }
@@ -39,7 +42,7 @@ class BeautyService {
         }
     }
 
-    Boolean matchesWithAnAppointment(TimeRange timeRange) {
+    Boolean matchesWithSchedule(TimeRange timeRange) {
         LocalTime currentTime = LocalTime.of(8,0)
         def timeSchedule = [currentTime]
 
@@ -51,23 +54,26 @@ class BeautyService {
         timeRange.start.toLocalTime() in timeSchedule
     }
 
-    Boolean isNonWorkableDay(TimeRange timeRange) {
-        DayOfWeek rangeDayOfWeek = timeRange.start.getDayOfWeek()
-        rangeDayOfWeek in [DayOfWeek.SUNDAY]
+    Boolean isWorkableDay(TimeRange timeRange) {
+        !(timeRange.start.getDayOfWeek() in [DayOfWeek.SUNDAY])
     }
 
-    Appointment makeAppointment(Customer customer, TimeRange timeRange, CheckExistingAppointments appointmentsChecker) {        
-        if (!matchesWithAnAppointment(timeRange)) {
-            throw new IncompatibleAppointmentTimeRangeException("No se ofrece ningun turno a las ${timeRange.start.toLocalTime()}")
-        } else if (isNonWorkableDay(timeRange)) {
+    Boolean isAlreadyTaken(TimeRange timeRange) {
+        appointments ? (appointments.any{ it.timeRange.equals(timeRange) && !it.cancelled }) : false
+    }
+
+    Appointment makeAppointmentFor(TimeRange timeRange) {
+        if (!matchesWithSchedule(timeRange)) {
+            throw new IncompatibleAppointmentStartTimeException("No se ofrece ningun turno a las ${timeRange.start.toLocalTime()}")
+        } else if (!isWorkableDay(timeRange)) {
             String dayOfWeekInSpanish = timeRange.start.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es", "ES"))
-            throw new IncompatibleAppointmentTimeRangeException("No se ofrecen turnos los dias ${dayOfWeekInSpanish}s")
-        } else if (appointmentsChecker.existsOverlappingFor(customer, timeRange)) {
-            throw new ExistingAppointmentOverlappingException("El turno seleccionado se solapa con uno que ya reservaste")
-        } else if (appointmentsChecker.isTaken(this, timeRange)) {
+            throw new IncompatibleAppointmentStartTimeException("No se ofrecen turnos los dias ${dayOfWeekInSpanish}s")
+        } else if (isAlreadyTaken(timeRange)) {
             throw new AppointmentAlreadyTakenException("El turno ya fue reservado por otro cliente")
         }
 
-        new Appointment(customer, this, timeRange)
+        Appointment newAppointment = new Appointment(price, timeRange)
+        addToAppointments(newAppointment)
+        newAppointment
     }
 }
