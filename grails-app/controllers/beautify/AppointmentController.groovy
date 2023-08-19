@@ -1,7 +1,6 @@
 package beautify
 
 import java.time.*
-//import org.grails.plugins.web.taglib.message
 
 class AppointmentController {
 

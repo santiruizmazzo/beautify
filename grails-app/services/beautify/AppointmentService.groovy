@@ -6,28 +6,22 @@ import time_range.TimeRange
 
 @Transactional
 class AppointmentService {
-    
-    def appointmentRepository
 
     Appointment make(Long customerId, Long beautyServiceId, LocalDateTime startDateTime) {
         Customer customer = Customer.get(customerId)
         BeautyService beautyService = BeautyService.get(beautyServiceId)
+
         TimeRange timeRange = new TimeRange(startDateTime, startDateTime.plusMinutes(beautyService.duration.longValue()))
-        Appointment appointment = beautyService.makeAppointment(customer, timeRange, appointmentRepository)
-        appointment.save()
+        Appointment appointment = beautyService.makeAppointmentFor(timeRange)
+        customer.schedule(appointment)
+        appointment
     }
 
-    Appointment rate(Long appointmentId, Integer rating, String comment) {
-        Appointment appointment = Appointment.get(appointmentId)
-        appointment.rate(rating, comment)
-        appointment.save()
+    void rate(Long appointmentId, Integer rating, String comment) {
+        Appointment.get(appointmentId).rate(rating, comment)
     }
 
-    def cancel(Long appointmentId) {
-        Appointment appointment = Appointment.get(appointmentId)
-        if (!appointment.isWithinCancellationTime()) {
-            throw new RuntimeException("El tiempo para cancelar el turno ya termino")
-        }
-        appointment.delete()
+    void cancel(Long appointmentId) {
+        Appointment.get(appointmentId).cancel()
     }
 }

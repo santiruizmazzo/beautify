@@ -6,11 +6,10 @@ import time_range.TimeRange
 
 class Appointment {
 
-    Customer customer
-    BeautyService beautyService
     BigDecimal servicePriceWhenBooked
     TimeRange timeRange
     Boolean attended
+    Boolean cancelled
     Integer rating
     String comment
 
@@ -18,6 +17,8 @@ class Appointment {
     static final Integer MAX_RATING = 5
     static final Integer MAX_RATING_HOURS = 24
     static final Integer MINS_BEFORE_START_TO_CANCEL = 120
+
+    static belongsTo = [customer: Customer, beautyService: BeautyService]
 
     static embedded = ['timeRange']
 
@@ -27,12 +28,11 @@ class Appointment {
         comment nullable: true
     }
 
-    Appointment(Customer customer, BeautyService beautyService, TimeRange timeRange) {
-        this.customer = customer
-        this.beautyService = beautyService
-        servicePriceWhenBooked = beautyService.price
+    Appointment(BigDecimal servicePrice, TimeRange timeRange) {
+        servicePriceWhenBooked = servicePrice
         this.timeRange = timeRange
         attended = false
+        cancelled = false
     }
 
     static class AlreadyRatedAppointmentException extends RuntimeException {
@@ -59,6 +59,16 @@ class Appointment {
         }
     }
 
+    static class EndOfCancellationTimeException extends RuntimeException {
+        EndOfCancellationTimeException(String errorMessage) {
+            super(errorMessage)
+        }
+    }
+
+    Boolean isRated() {
+        rating == null ? false : true
+    }
+
     Boolean isValidRating(Integer ratingToValidate) {
         MIN_RATING <= ratingToValidate && ratingToValidate <= MAX_RATING
     }
@@ -67,7 +77,7 @@ class Appointment {
         timeRange.end.until(LocalDateTime.now(), ChronoUnit.HOURS) <= MAX_RATING_HOURS
     }
 
-    def rate(Integer rating, String comment) {
+    void rate(Integer rating, String comment) {
         if (isRated()) {
             throw new AlreadyRatedAppointmentException("No se puede calificar un turno mas de una vez")
         } else if (!attended) {
@@ -77,20 +87,22 @@ class Appointment {
         } else if (!isWithinRatingTime()) {
             throw new EndOfRatingTimeException("Ya pasaron mas de ${MAX_RATING_HOURS} desde que asististe al turno")
         }
-
         setRating rating
         setComment comment
     }
 
-    Boolean isRated() {
-        rating == null ? false : true
+    Boolean isWithinCancellationTime() {
+        LocalDateTime.now().until(timeRange.start, ChronoUnit.MINUTES) > MINS_BEFORE_START_TO_CANCEL
+    }
+
+    void cancel() {
+        if (!isWithinCancellationTime()) {
+            throw new EndOfCancellationTimeException("El tiempo para cancelar el turno ya termino")
+        }
+        setCancelled true
     }
 
     Boolean canStillAttend() {
         !attended && LocalDateTime.now().isBefore(timeRange.end)
-    }
-
-    Boolean isWithinCancellationTime() {
-        LocalDateTime.now().until(timeRange.start, ChronoUnit.MINUTES) > MINS_BEFORE_START_TO_CANCEL
     }
 }
