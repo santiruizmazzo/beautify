@@ -42,7 +42,7 @@
           <div class="col-lg-20">
             <div class="bs-component">
               <div class="card border-primary mb-3" style="max-width: 20rem;">
-                <g:link action="show" id="${beautyService.id}" style="text-decoration:none">
+                <g:link action="detail" id="${beautyService.id}" style="text-decoration:none">
                   <div class="card-header"><b>${beautyService.name}</b></div>
                   <div class="card-body">
                     <p>${beautyService.description}</p>

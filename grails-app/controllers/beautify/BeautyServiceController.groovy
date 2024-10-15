@@ -2,13 +2,13 @@ package beautify
 
 class BeautyServiceController {
 
-    //static scaffold = BeautyService
+    static scaffold = BeautyService
 
-    def index() {
+    def list() {
         [beautyServices: BeautyService.list()]
     }
 
-    def show(Long id) {
+    def detail(Long id) {
         [beautyService: BeautyService.get(id)]
     }
 }

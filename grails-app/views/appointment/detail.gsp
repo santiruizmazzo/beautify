@@ -19,7 +19,7 @@
 
       <div class="row mb-3">
         <div class="col-lg-7">
-          <g:link class="btn btn-outline-primary" controller="appointment" action="index">Atras</g:link>
+          <g:link class="btn btn-outline-primary" controller="appointment" action="list">Atras</g:link>
         </div>
       </div>
 

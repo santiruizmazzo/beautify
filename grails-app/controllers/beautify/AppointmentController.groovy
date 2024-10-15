@@ -7,7 +7,7 @@ class AppointmentController {
     def appointmentService
     def messageSource
 
-    def index() {
+    def list() {
         Customer customer = Customer.get(session.customerId)
         [appointments: Appointment.findAllByCustomer(customer)]
     }
@@ -15,7 +15,7 @@ class AppointmentController {
     def make(AppointmentInfo info) {
         if (!info.validate()) {
             flash["error"] = info.errors.allErrors.collect { messageSource.getMessage(it, Locale.getDefault()) }
-            redirect controller: "beautyService", action: "show", id: info.beautyServiceId
+            redirect controller: "beautyService", action: "detail", id: info.beautyServiceId
             return
         }
 
@@ -24,14 +24,14 @@ class AppointmentController {
             redirect action: "madeSuccessfully", model: [appointment: a]
         } catch (Exception e) {
             flash["error"] = [e.message]
-            redirect controller: "beautyService", action: "show", id: info.beautyServiceId
+            redirect controller: "beautyService", action: "detail", id: info.beautyServiceId
         }
     }
 
     def madeSuccessfully() {
     }
 
-    def show(Long id) {
+    def detail(Long id) {
         Appointment a = Appointment.get(id)
         if (!a) {
             redirect uri: "404"
@@ -42,7 +42,7 @@ class AppointmentController {
 
     def rate(RatingInfo info) {
         if (!info.validate()) {
-            redirect action: "index", params: [customerId: 1]
+            redirect action: "list", params: [customerId: 1]
             return
         }
 
@@ -60,7 +60,7 @@ class AppointmentController {
             redirect action: "cancelledSuccessfully"
         } catch(Exception e) {
             flash["error"] = e.message
-            redirect action: "show", id: id
+            redirect action: "detail", id: id
         }
     }
 

@@ -52,8 +52,8 @@
           </div>
         </div>
         <div class="d-grid gap-2">
-          <g:link class="btn btn-lg btn-primary" controller="appointment" action="index"><b>Mis turnos</b></g:link>
-          <g:link class="btn btn-lg btn-primary" controller="beautyService" action="index"><b>Reservar turno</b></g:link>
+          <g:link class="btn btn-lg btn-primary" controller="appointment" action="list"><b>Mis turnos</b></g:link>
+          <g:link class="btn btn-lg btn-primary" controller="beautyService" action="list"><b>Reservar turno</b></g:link>
         </div>
       </g:else>
       

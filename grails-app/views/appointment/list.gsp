@@ -31,28 +31,30 @@
 
       <div class="row">
         <div class="col-lg-7">
-          <g:if test="${!appointments}">
+          <g:if test="${appointments.count { it.cancelled } == appointments.size}">
             No has reservado ningun turno aun.
           </g:if>
         </div>
       </div>
 
       <g:each var="appointment" in="${appointments}">
-        <div class="row">
-          <div class="col-lg-20">
-            <div class="bs-component">
-              <div class="card border-primary mb-3" style="max-width: 20rem;">
-                <g:link action="show" id="${appointment.id}" style="text-decoration:none">
-                  <div class="card-header"><b>${appointment.beautyService.name}</b></div>
-                  <div class="card-body">
-                    <p>${appointment.timeRange}</p>
-                    <p>$${appointment.servicePriceWhenBooked}</p>
-                  </div>
-                </g:link>
+        <g:if test="${!appointment.cancelled}">
+          <div class="row">
+            <div class="col-lg-20">
+              <div class="bs-component">
+                <div class="card border-primary mb-3" style="max-width: 20rem;">
+                  <g:link action="detail" id="${appointment.id}" style="text-decoration:none">
+                    <div class="card-header"><b>${appointment.beautyService.name}</b></div>
+                    <div class="card-body">
+                      <p>${appointment.timeRange}</p>
+                      <p>$${appointment.servicePriceWhenBooked}</p>
+                    </div>
+                  </g:link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </g:if>
       </g:each>
 
     </div>

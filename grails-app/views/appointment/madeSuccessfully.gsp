@@ -19,7 +19,7 @@
 
       <div class="row mb-3">
         <div class="col-lg-20">
-          <g:link class="btn btn-outline-primary" controller="beautyService" action="index">Seguir reservando turnos</g:link>
+          <g:link class="btn btn-outline-primary" controller="beautyService" action="list">Seguir reservando turnos</g:link>
         </div>
       </div>
       
