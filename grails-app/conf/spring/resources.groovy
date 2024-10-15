@@ -1,5 +1,5 @@
-import repository.AppointmentRepository
+// import repository.AppointmentRepository
 
 beans = {
-    appointmentRepository(AppointmentRepository)
+    // appointmentRepository(AppointmentRepository)
 }

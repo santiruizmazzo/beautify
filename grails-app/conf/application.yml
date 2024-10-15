@@ -109,12 +109,19 @@ dataSource:
     driverClassName: org.h2.Driver
     username: santiruizmazzo
     password: ''
+    readOnly: false
+    logSql: true
 
 environments:
     development:
         dataSource:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+            driverClassName: org.postgresql.Driver
+            username: postgres
+            password: example
             dbCreate: update
-            url: jdbc:h2:./db/devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+            url: jdbc:postgresql://test_db:5432/postgres
+            # url: jdbc:h2:./db/devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     test:
         dataSource:
             dbCreate: update

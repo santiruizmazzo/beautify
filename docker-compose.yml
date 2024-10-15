@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: beautify
+    container_name: beautify
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    environment:
+      PORT: 8000
+      DB_URL: "postgresql://postgres:example@test_db:5432/postgres"
+    depends_on:
+      - test_db
+
+  test_db:
+    image: postgres
+    container_name: test_db
+    environment:
+      POSTGRES_PASSWORD: example
+
+networks:
+  default:
+    name: localdev
